@@ -36,7 +36,7 @@ class PlotCanvas(FigureCanvas):
 
     def plot(self, data, ylabel=""):
         self.axes.cla()
-        self.axes.plot(data, marker="o" if len(data)<=20 else "", linestyle="-" )
+        self.axes.plot(data, linestyle='-')  # siempre línea continua
         if ylabel:
             self.axes.set_ylabel(ylabel)
         self.axes.grid(True)
@@ -54,9 +54,10 @@ class ControlGUI(QWidget):
         # Estados y datos
         self.estado = ['0','0','0','0']
         self.velocidad_extrusor = 2000
-        self.temp_data = []        # lecturas de temperatura
-        self.motor_data = []       # 1/0 motor spool
-        self.extruder_data = []    # 1/0 extrusor
+        self.temp_data     = []        # lecturas de temperatura
+        self.motor_data    = []        # 1/0 motor spool
+        self.fan_data      = []        # 1/0 fan
+        self.extruder_data = []        # 1/0 extrusor
 
         # Layout principal: izquierda (gráficas) / derecha (controles)
         main_layout = QHBoxLayout(self)
@@ -66,9 +67,11 @@ class ControlGUI(QWidget):
         left_layout = QVBoxLayout(left_widget)
         self.canvas_temp     = PlotCanvas(self, width=5, height=2)
         self.canvas_motor    = PlotCanvas(self, width=5, height=2)
+        self.canvas_fan      = PlotCanvas(self, width=5, height=2)
         self.canvas_extruder = PlotCanvas(self, width=5, height=2)
         left_layout.addWidget(self.canvas_temp)
         left_layout.addWidget(self.canvas_motor)
+        left_layout.addWidget(self.canvas_fan)
         left_layout.addWidget(self.canvas_extruder)
         main_layout.addWidget(left_widget, 3)
 
@@ -147,6 +150,9 @@ class ControlGUI(QWidget):
             elif line.startswith("Motor Spool:"):
                 v = 1 if "Encendido" in line else 0
                 self.motor_data.append(v)
+            elif line.startswith("Fan:"):
+                v = 1 if "Encendido" in line else 0
+                self.fan_data.append(v)
             elif line.startswith("Extruder:"):
                 v = 1 if "Encendido" in line else 0
                 self.extruder_data.append(v)
@@ -155,11 +161,13 @@ class ControlGUI(QWidget):
         max_len = 100
         self.temp_data     = self.temp_data[-max_len:]
         self.motor_data    = self.motor_data[-max_len:]
+        self.fan_data      = self.fan_data[-max_len:]
         self.extruder_data = self.extruder_data[-max_len:]
 
         # 4) Actualizar gráficas
         self.canvas_temp.plot(self.temp_data, ylabel="Temp (°C)")
         self.canvas_motor.plot(self.motor_data, ylabel="Motor ON/OFF")
+        self.canvas_fan.plot(self.fan_data, ylabel="Fan ON/OFF")
         self.canvas_extruder.plot(self.extruder_data, ylabel="Extrusor ON/OFF")
 
     #------------------------------------------------
@@ -172,11 +180,12 @@ class ControlGUI(QWidget):
         import csv
         with open(path, 'w', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(['index','Temp','Motor','Extrusor'])
+            writer.writerow(['index','Temp','Motor','Fan','Extrusor'])
             for i in range(len(self.temp_data)):
                 m = self.motor_data[i] if i < len(self.motor_data) else ''
+                f_ = self.fan_data[i]    if i < len(self.fan_data)   else ''
                 e = self.extruder_data[i] if i < len(self.extruder_data) else ''
-                writer.writerow([i, self.temp_data[i], m, e])
+                writer.writerow([i, self.temp_data[i], m, f_, e])
         print(f"CSV guardado en {path}")
 
 # -----------------------
