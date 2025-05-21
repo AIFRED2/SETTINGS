@@ -96,7 +96,7 @@ class ControlGUI(QWidget):
         # Slider de velocidad de extrusor
         self.lbl_slider = QLabel(f"Velocidad Extrusor: {self.velocidad_extrusor}")
         self.slider     = QSlider(Qt.Horizontal)
-        self.slider.setRange(100, 3000)
+        self.slider.setRange(10, 100)
         self.slider.setValue(self.velocidad_extrusor)
         self.slider.valueChanged.connect(self.actualizar_velocidad)
         right_layout.addWidget(self.lbl_slider)
