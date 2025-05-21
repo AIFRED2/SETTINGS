@@ -124,7 +124,8 @@ void loop() {
   unsigned long currentMillis = millis();
   if (currentMillis - lastStatusUpdate >= 1000) {
     lastStatusUpdate = currentMillis;
-
+    Serial.print("Temp:"); 
+    Serial.println(Input);
     Serial.println("--- Estado de componentes ---");
     Serial.print("Motor Spool: "); Serial.println(moto_m ? "Encendido" : "Apagado");
     Serial.print("Fan:          "); Serial.println(fan_m ? "Encendido" : "Apagado");
