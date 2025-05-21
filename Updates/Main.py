@@ -53,7 +53,7 @@ class ControlGUI(QWidget):
 
         # Estados y datos
         self.estado = ['0','0','0','0']
-        self.velocidad_extrusor = 2000
+        self.velocidad_extrusor = 100
         self.temp_data     = []        # lecturas de temperatura
         self.motor_data    = []        # 1/0 motor spool
         self.fan_data      = []        # 1/0 fan
